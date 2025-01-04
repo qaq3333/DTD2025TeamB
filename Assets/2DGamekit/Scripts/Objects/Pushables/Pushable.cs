@@ -57,9 +57,9 @@ namespace Gamekit2D
 
         void FixedUpdate ()
         {
-            Vector2 velocity = m_Rigidbody2D.velocity;
+            Vector2 velocity = m_Rigidbody2D.linearVelocity;
             velocity.x = 0f;
-            m_Rigidbody2D.velocity = velocity;
+            m_Rigidbody2D.linearVelocity = velocity;
 
             CheckGrounded();
 

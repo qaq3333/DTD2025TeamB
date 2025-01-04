@@ -382,7 +382,7 @@ namespace Gamekit2D
 
             shootingAudio.PlayRandomSound();
 
-            obj.rigidbody2D.velocity = (GetProjectilVelocity(m_TargetShootPosition, shootingOrigin.transform.position));
+            obj.rigidbody2D.linearVelocity = (GetProjectilVelocity(m_TargetShootPosition, shootingOrigin.transform.position));
         }
 
         //This will give the velocity vector needed to give to the bullet rigidbody so it reach the given target from the origin.

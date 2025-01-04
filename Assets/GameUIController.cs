@@ -1,13 +1,18 @@
-﻿using UnityEngine;
+﻿using Gamekit2D;
+using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class GameUIController : MonoBehaviour {
-    public InputActionReference pauseAction;
+    public MenuState currentState;
     public GameObject menuEffect;
     public GameObject gameClearMenu;
     public GameObject gameOverMenu;
     public GameObject pauseMenu;
-    public MenuState currentState;
+    public InputActionReference pauseAction;
+
+    [SceneName]
+    public string mainMenuSceneName;
 
     void OnEnable() {
         SetMenuState(currentState);
@@ -53,17 +58,27 @@ public class GameUIController : MonoBehaviour {
         currentState = state;
     }
 
-    public void OnPause(InputAction.CallbackContext context) {
-        if (currentState is MenuState.None or MenuState.Pause)
-            SetMenuState(currentState == MenuState.Pause ? MenuState.None : MenuState.Pause);
-    }
-
     public void GameClear() {
         if (currentState is MenuState.None) SetMenuState(MenuState.GameClear);
     }
 
     public void GameOver() {
         if (currentState is MenuState.None) SetMenuState(MenuState.GameOver);
+    }
+
+    public void OnPause(InputAction.CallbackContext context) {
+        if (currentState is MenuState.None or MenuState.Pause)
+            SetMenuState(currentState == MenuState.Pause ? MenuState.None : MenuState.Pause);
+    }
+
+    public void Restart() {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        Time.timeScale = 1f;
+    }
+
+    public void MainMenu() {
+        SceneManager.LoadScene(mainMenuSceneName);
+        Time.timeScale = 1f;
     }
 
     public enum MenuState {

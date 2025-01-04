@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
 
-public class Audiocontroller : MonoBehaviour
+public class AudioController : MonoBehaviour
 {
     public AudioClip defaultAmbience;
     private AudioSource track01,track02;
     private bool isPlayingTrack01;
-    public static Audiocontroller instance;
+    public static AudioController instance;
+    public AudioMixerGroup mixerGroup;
     
 
     private void Awake()
@@ -19,6 +21,8 @@ public class Audiocontroller : MonoBehaviour
     {
         track01 =  gameObject.AddComponent<AudioSource>();
         track02 =  gameObject.AddComponent<AudioSource>();
+        track01.outputAudioMixerGroup = mixerGroup;
+        track02.outputAudioMixerGroup = mixerGroup;
         track01.loop = true;
         track02.loop = true;
         isPlayingTrack01 = true;

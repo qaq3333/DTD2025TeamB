@@ -39,6 +39,7 @@ public class MapSwitch : MonoBehaviour
     // 顯示特定遊戲物件，隱藏其他
     void ShowOnlyObject()
     {
+        isShowingObject1 = !isShowingObject1;
         if (isShowingObject1)
         {
             blackmap.SetActive(true);
@@ -50,7 +51,6 @@ public class MapSwitch : MonoBehaviour
             whitemap.SetActive(true);
         }
         // 切換狀態
-        isShowingObject1 = !isShowingObject1;
     }
 
     public void OnInteract(InputAction.CallbackContext context) {

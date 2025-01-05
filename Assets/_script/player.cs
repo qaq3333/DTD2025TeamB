@@ -1,45 +1,50 @@
-using Unity.VisualScripting;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+
 [RequireComponent(typeof(Rigidbody2D))]
-public class NewMonoBehaviourScript : MonoBehaviour
+public class player : MonoBehaviour
 {
 
     public float speed = 0.1f;
     Rigidbody2D rigid2D;
-    public float jumpForce = 0.3f; // ¸õÅDªº¤O¶q
-    public int jumpCount = 0; // ·í«e¸õÅD¦¸¼Æ
-    public int maxJumpCount = 2; // ³Ì¤j¤¹³\¸õÅD¦¸¼Æ
+    public float jumpForce = 0.3f; // ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½Oï¿½q
+    public int jumpCount = 0; // ï¿½ï¿½eï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
+    public int maxJumpCount = 2; // ï¿½Ì¤jï¿½ï¿½ï¿½\ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
     public float speed_x_constraint;
     public Animator playerani;
     public SpriteRenderer playerSr;
     public Animator playjump;
+    public AudioSource footStepAudioSource;
+    public AudioSource jumpAudioSource;
+    public AudioSource landAudioSource;
+
+    float _moveDirection;
+    bool _jumpHeld;
+
     void Start()
     {
-        print("Start");
         rigid2D = this.gameObject.GetComponent<Rigidbody2D>();
-        print("jump");
         rigid2D = this.gameObject.GetComponent<Rigidbody2D>();
     }
 
   
-    void Update()
-        
+    void FixedUpdate()
     {
         bool IsWalking = false;
         bool IsJump = false;
-        if (Input.GetKeyDown(KeyCode.Space) && jumpCount < maxJumpCount)
+        if (playjump.GetInteger("jump") == 0 && _jumpHeld && jumpCount < maxJumpCount)
         {
             IsJump = true;
-            // °õ¦æ¸õÅD
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½D
             rigid2D.AddForce(new Vector2(0, jumpForce), ForceMode2D.Impulse);
-            // ¼W¥[¸õÅD¦¸¼Æ
+            // ï¿½Wï¿½[ï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
             jumpCount++;
-            print("Jump");
+            jumpAudioSource.Play();
         }
 
-        if (Input.GetKey(KeyCode.D))
+        if (_moveDirection > 0f)
         {
             if(playerSr.flipX == true)
             {
@@ -49,7 +54,7 @@ public class NewMonoBehaviourScript : MonoBehaviour
             rigid2D.AddForce(new Vector2(500 * speed, 0), ForceMode2D.Force);
             //this.gameObject.transform.position += new Vector3(speed, 0, 0);
         }
-        if (Input.GetKey(KeyCode.A))
+        if (_moveDirection < 0f)
         {
             if (playerSr.flipX == false)
             {
@@ -57,8 +62,12 @@ public class NewMonoBehaviourScript : MonoBehaviour
             }
             IsWalking = true;
             rigid2D.AddForce(new Vector2(-500 * speed, 0), ForceMode2D.Force);
+            if (!footStepAudioSource.isPlaying) footStepAudioSource.Play();
         }
 
+        if (_moveDirection == 0f)
+            if (footStepAudioSource.isPlaying)
+                footStepAudioSource.Stop();
         if (IsWalking)
         {
             if (playerani.GetInteger("status") == 0)
@@ -92,18 +101,33 @@ public class NewMonoBehaviourScript : MonoBehaviour
         {
             rigid2D.linearVelocity = new Vector2(-speed_x_constraint, rigid2D.linearVelocity.y);
         }
-        print(rigid2D.angularVelocity);
-       
     }
-    // ½T«O¦b¨¤¦â±µÄ²¦a­±®É¥i¥H­«¸m¸õÅD¦¸¼Æ
+    // ï¿½Tï¿½Oï¿½bï¿½ï¿½ï¿½â±µÄ²ï¿½aï¿½ï¿½ï¿½É¥iï¿½Hï¿½ï¿½ï¿½mï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        // ÀË¬d¸I¼²ªº¹ï¶H¬O§_¬O¦a­±
+        if (collision.gameObject.CompareTag("GameClear")) FindAnyObjectByType<GameUIController>()?.GameClear();
+        // ï¿½Ë¬dï¿½Iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Hï¿½Oï¿½_ï¿½Oï¿½aï¿½ï¿½
         if (collision.gameObject.CompareTag("Ground"))
         {
-            // ­«¸m¸õÅD¦¸¼Æ
+            // ï¿½ï¿½ï¿½mï¿½ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
             jumpCount = 0;
+            landAudioSource.Play();
         }
     }
 
+    void OnTriggerEnter2D(Collider2D other) {
+        if (other.gameObject.CompareTag("GameOver")) FindAnyObjectByType<GameUIController>()?.GameOver();
+    }
+
+    public void OnMove(InputAction.CallbackContext context) {
+        _moveDirection = context.ReadValue<float>();
+    }
+
+    public void OnJump(InputAction.CallbackContext context) {
+        if (context.started) {
+            _jumpHeld = true;
+        } else if (context.canceled) {
+            _jumpHeld = false;
+        }
+    }
 }

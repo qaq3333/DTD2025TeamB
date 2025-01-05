@@ -1,7 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using BTAI;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 public class MapSwitch : MonoBehaviour
 {
@@ -10,18 +13,26 @@ public class MapSwitch : MonoBehaviour
     public GameObject whitemap;
     // public GameObject allmap;
     private bool isShowingObject1 = true;
+    bool _interactHeld;
+    bool _interactCooldown;
+
+    void OnEnable() {
+        if (!blackmap) GameObject.FindWithTag("BlackWorld");
+        if (!whitemap) GameObject.FindWithTag("WhiteWorld");
+    }
+
     void Start()
     {
-        blackmap.SetActive(false);
-        whitemap.SetActive(false);
-
+        ShowOnlyObject();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (_interactCooldown) return;
+        if (_interactHeld)
         {
             ShowOnlyObject();
+            _interactCooldown = true;
         }
     }
 
@@ -40,5 +51,14 @@ public class MapSwitch : MonoBehaviour
         }
         // 切換狀態
         isShowingObject1 = !isShowingObject1;
+    }
+
+    public void OnInteract(InputAction.CallbackContext context) {
+        if (context.started) {
+            _interactHeld = true;
+        } else if (context.canceled) {
+            _interactHeld = false;
+            _interactCooldown = false;
+        }
     }
 }

@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using BTAI;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Object = UnityEngine.Object;
 
 public class MapSwitch : MonoBehaviour
 {
@@ -13,6 +15,12 @@ public class MapSwitch : MonoBehaviour
     private bool isShowingObject1 = true;
     bool _interactHeld;
     bool _interactCooldown;
+
+    void OnEnable() {
+        if (!blackmap) GameObject.FindWithTag("BlackWorld");
+        if (!whitemap) GameObject.FindWithTag("WhiteWorld");
+    }
+
     void Start()
     {
         ShowOnlyObject();
